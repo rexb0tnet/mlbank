@@ -1,0 +1,76 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr  7 18:27:39 2020
+
+@author: sujit
+"""
+#DATA PRE-PROCESSING
+#Import Prime Lib
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+#Import Data_set
+
+dataset = pd.read_csv('ccc.csv')
+
+#Split the Dataset
+
+X = dataset.iloc[:,1:24].values
+y= dataset.iloc[:,-1].values
+
+
+#Split Trainset & Testset
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+#Feature Scale
+
+from sklearn.preprocessing import StandardScaler
+sc_X = StandardScaler()
+X_train = sc_X.fit_transform(X_train)
+X_test = sc_X.transform(X_test)
+
+
+
+#BUILD ANN
+#Import Lib
+
+import keras 
+from keras.models import Sequential
+from keras.layers import Dense
+
+#Inc ANN Arch
+
+classifier = Sequential()
+
+#Build First Layer 
+classifier.add(Dense(12, kernel_initializer= 'uniform', activation = 'relu', input_dim = 23 ))
+
+#Build Hidden Layer
+classifier.add(Dense(12, kernel_initializer= 'uniform', activation = 'relu' ))
+
+#Build Last Layer
+
+classifier.add(Dense(1, kernel_initializer= 'uniform', activation = 'sigmoid' ))
+
+#compile the ANN
+
+classifier.compile(optimizer='adam', loss= 'binary_crossentropy', metrics = ['accuracy'])
+
+#Fit the ANN
+
+classifier.fit(x =X_train, y=y_train, batch_size= 10, epochs=100)
+
+# Predict the Test
+y_pred = classifier.predict(X_test)
+
+
+#Round off
+y_pred = (y_pred > 0.5)
+
+#confusion Matrix
+
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
